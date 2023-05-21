@@ -15,23 +15,7 @@ GTEXT(__initialize)
 GTEXT(_isr_wrapper)
 
 SECTION_FUNC(vectors, __start)
-
-/* Set up PMP to mark prac as execute only and lock it*/
-la t0, prac_begin
-srli t0, t0, 2
-li t1, 0x8F
-csrw pmpaddr0, t0
-csrw pmpcfg0, t1
-
-la t0, prac_end
-srli t0, t0, 2
-li t1, 0x8C8F
-csrw pmpaddr1, t0
-csrw pmpcfg0, t1
-
-la t0, prac_begin
-#sb t1, -1(t0)
-#sb t1, 0x20(t0)
+#include <zephyr/arch/riscv/sprav/boot.S>
 
 #if defined(CONFIG_RISCV_GP)
 	/* Initialize global pointer */

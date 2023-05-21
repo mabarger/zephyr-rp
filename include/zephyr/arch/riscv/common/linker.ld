@@ -122,6 +122,8 @@ SECTIONS
 #include <linker_relocate.ld>
 #endif
 
+#include <zephyr/arch/riscv/sprav/linker.ld>
+
     SECTION_PROLOGUE(_RESET_SECTION_NAME,,)
     {
 		KEEP(*(.reset.*))
