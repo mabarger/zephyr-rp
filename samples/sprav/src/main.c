@@ -17,9 +17,9 @@
 
 int main(void)
 {
-	uint8_t signature[128] = {0};
+	uint8_t signature[64] = {0};
 	printk("rp_attest_region: %d\n", sprav_attest_region(0x20000000, 0x400, 0x9f6e4ed0, signature));
-	for (int i = 0; i < 32; i++) {
+	for (int i = 0; i < 64; i++) {
 		printk("%02x", signature[i]);
 	}
 	printk("\n");
