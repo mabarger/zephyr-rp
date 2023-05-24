@@ -54,6 +54,44 @@ static void read_pmp_register(int region_id, size_t *addr, size_t *conf)
 	}
 }
 
+static void write_pmp_register(int region_id, size_t addr, size_t conf)
+{
+	switch (region_id) {
+	case 0:
+		csr_write(pmpaddr0, addr);
+		csr_write(pmpcfg0, conf);
+		break;
+	case 1:
+		csr_write(pmpaddr1, addr);
+		csr_write(pmpcfg0, conf);
+		break;
+	case 2:
+		csr_write(pmpaddr2, addr);
+		csr_write(pmpcfg0, conf);
+		break;
+	case 3:
+		csr_write(pmpaddr3, addr);
+		csr_write(pmpcfg0, conf);
+		break;
+	case 4:
+		csr_write(pmpaddr4, addr);
+		csr_write(pmpcfg1, conf);
+		break;
+	case 5:
+		csr_write(pmpaddr5, addr);
+		csr_write(pmpcfg1, conf);
+		break;
+	case 6:
+		csr_write(pmpaddr6, addr);
+		csr_write(pmpcfg1, conf);
+		break;
+	case 7:
+		csr_write(pmpaddr7, addr);
+		csr_write(pmpcfg1, conf);
+		break;
+	}
+}
+
 static void parse_pmp_register(struct pmp_config *pmp_cfg, int region_id)
 {
 	size_t addr = 0;
@@ -108,6 +146,28 @@ int z_impl_pmp_get_config(struct pmp_config *pmp_cfg, int region_id)
 	if (region_id != -1) {
 		parse_pmp_register(&pmp_cfg[0], region_id);
 	}
+
+	return 0;
+}
+
+int z_impl_pmp_set_config(size_t addr, size_t conf, int region_id)
+{
+	size_t curr_addr = 0;
+	size_t curr_conf = 0;
+
+	if (region_id >= CONFIG_PMP_SLOTS && region_id < 0) {
+		return -EFAULT;
+	}
+
+	read_pmp_register(region_id, &curr_addr, &curr_conf);
+	if ( (curr_conf >> (region_id % 4) * 8) & PMP_L) {
+		return -EFAULT;
+	}
+
+	curr_conf &= ~(0xf << (region_id % 4) * 8);
+	curr_conf |= (conf << (region_id % 4) * 8);
+
+	write_pmp_register(region_id, curr_addr, curr_conf);
 
 	return 0;
 }

@@ -36,6 +36,17 @@ struct pmp_config {
  */
 __syscall int pmp_get_config(struct pmp_config *pmp_cfg, int region_id);
 
+/**
+ * @brief Configures the specified PMP region
+ *
+ * @param[in] addr address register value
+ * @param[in] conf configuration register value
+ * @param[in] region_id PMP region id
+ *
+ * @return 0 on success, -EFAULT otherwise.
+ */
+__syscall int pmp_set_config(size_t addr, size_t conf, int region_id);
+
 #ifdef __cplusplus
 }
 #endif
