@@ -46,7 +46,6 @@ static inline int z_impl_sprav_attest_region(uintptr_t addr, size_t size,
 	return sprav_attest_region_protected(addr, size, nonce, signature);
 }
 
-
 #ifdef __cplusplus
 }
 #endif

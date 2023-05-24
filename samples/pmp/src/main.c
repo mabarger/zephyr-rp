@@ -7,22 +7,17 @@
 /**
  * @file
  *
- * SPRAV Remote Attestation Demo
+ * RISC-V Physical Memory Protection Demo
  */
 
 #include <zephyr/kernel.h>
 #include <zephyr/sys/printk.h>
-#include <zephyr/drivers/sprav.h>
-#if 1
 #include <zephyr/drivers/pmp.h>
-#endif
 
 #include <string.h>
 
-
 int main(void)
 {
-#if 1
 	struct pmp_config cfg[PMP_MAX_REGIONS];
 	memset(cfg, 0, sizeof(struct pmp_config) * PMP_MAX_REGIONS);
 
@@ -35,15 +30,5 @@ int main(void)
 		printk("Active: %c | Locked: %c | ", cfg[i].active ? 'T' : 'F', cfg[i].locked ? 'T' : 'F');
 		printk("Permissions: >%c%c%c<\n", cfg[i].perm & PMP_R ? 'r' : ' ', cfg[i].perm & PMP_W ? 'w' : ' ', cfg[i].perm & PMP_X ? 'x' : ' ');
 	}
-#endif
-
-
-	uint8_t signature[64] = {0};
-	printk("sprav_attest_region: %d\n", sprav_attest_region(0x20000000, 0x400, 0x9f6e4ed0, signature));
-	for (int i = 0; i < 64; i++) {
-		printk("%02x", signature[i]);
-	}
-	printk("\n");
-
 	return 0;
 }
