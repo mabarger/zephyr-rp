@@ -1,3 +1,9 @@
+/*
+ * Copyright (c) 2023 Maximilian Barger
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 /* Set up PMP to mark prac as execute only and lock it */
 la t0, prac_begin
 srli t0, t0, 2

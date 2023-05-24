@@ -4,11 +4,11 @@
 		*(prac)
 
 		/* Functions that will be placed in prac */
-		/*sprav_attest_region_protected = .;*/
-		*(.text.sprav_attest_region_protected);
-		*(.text.tc_sha256_*);
+		*(.text.sprav*);
+		*(.text.tc_sha256*);
 		*(.text.uECC*);
 
+		/* Pad with 0x00 to alignment border */
 		FILL(0x00)
 		. = (. + 4K) & ~0xFFF;
 	}
