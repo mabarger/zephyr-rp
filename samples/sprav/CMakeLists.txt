@@ -6,3 +6,54 @@ find_package(Zephyr REQUIRED HINTS $ENV{ZEPHYR_BASE})
 project(remote_attestation)
 
 target_sources(app PRIVATE src/main.c)
+
+include(ExternalProject)
+
+set(liboqs_root_dir    /home/haru/liboqs-riscv)
+set(liboqs_build_dir   /home/haru/liboqs-riscv/build)
+
+set(LIBOQS_LIB_DIR     /home/haru/liboqs-riscv/build/lib)
+set(LIBOQS_INCLUDE_DIR /home/haru/liboqs-riscv/build/include)
+
+if(CMAKE_GENERATOR STREQUAL "Unix Makefiles")
+# https://www.gnu.org/software/make/manual/html_node/MAKE-Variable.html
+set(submake "$(MAKE)")
+else() # Obviously no MAKEFLAGS. Let's hope a "make" can be found somewhere.
+set(submake "make")
+endif()
+
+# Create build folder
+execute_process(
+  COMMAND ${CMAKE_COMMAND} -E make_directory ${liboqs_build_dir}
+  COMMAND ${CMAKE_COMMAND} -E make_directory ${liboqs_build_dir}/include
+  COMMAND ${CMAKE_COMMAND} -E make_directory ${liboqs_build_dir}/lib
+  COMMAND touch /home/haru/liboqs-riscv/build/lib/liboqs.a
+  )
+
+ExternalProject_Add(
+  liboqs_project
+  PREFIX     ${liboqs_root_dir}
+  SOURCE_DIR ${liboqs_root_dir}
+  BINARY_DIR ${liboqs_build_dir}
+  CMAKE_ARGS -DCMAKE_TOOLCHAIN_FILE=../.CMake/toolchain_riscv32.cmake
+             -DOQS_BUILD_ONLY_LIB=1
+             -DOQS_USE_OPENSSL=0
+	     -DOQS_PERMIT_UNSUPPORTED_ARCHITECTURE=ON
+	     -DOQS_ALGS_ENABLED="STD"
+             ..
+	     BUILD_COMMAND ${CMAKE_COMMAND} -E env ninja
+  INSTALL_COMMAND ""
+  TEST_COMMAND ""
+  BUILD_BYPRODUCTS ${LIBOQS_LIB_DIR/liboqs.a}
+  )
+
+add_library(liboqs_lib STATIC IMPORTED GLOBAL)
+add_dependencies(
+  liboqs_lib
+  liboqs_project
+  )
+
+set_target_properties(liboqs_lib PROPERTIES IMPORTED_LOCATION ${LIBOQS_LIB_DIR}/liboqs.a)
+set_target_properties(liboqs_lib PROPERTIES INTERFACE_INCLUDE_DIRECTORIES ${LIBOQS_INCLUDE_DIR})
+
+target_link_libraries(app PUBLIC liboqs_lib)

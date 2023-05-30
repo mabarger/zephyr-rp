@@ -16,6 +16,10 @@
 #include <stdarg.h>
 #include <inttypes.h>
 
+#ifndef CONFIG_PMP_SLOTS
+#define CONFIG_PMP_SLOTS PMP_MAX_REGIONS
+#endif
+
 static void read_pmp_register(int region_id, size_t *addr, size_t *conf)
 {
 	switch (region_id) {
@@ -114,7 +118,6 @@ static void parse_pmp_register(struct pmp_config *pmp_cfg, int region_id)
 				pmp_cfg->size = addr << 2;
 			} else {
 				read_pmp_register(region_id - 1, &prev_addr, &prev_conf);
-				printk("This base: 0x%08x Prev base: 0x%08x\n", addr, prev_addr);
 				pmp_cfg->base = prev_addr << 2;
 				pmp_cfg->size = (addr << 2) - (prev_addr << 2);
 			}
