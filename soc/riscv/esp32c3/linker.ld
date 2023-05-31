@@ -270,6 +270,8 @@ SECTIONS
     _init_end = ABSOLUTE(.);
   } GROUP_DATA_LINK_IN(IRAM_REGION, ROMABLE_REGION)
 
+#include <zephyr/arch/riscv/sprav/linker.ld>
+
   .dram0.dummy (NOLOAD):
   {
     /**
@@ -301,6 +303,7 @@ SECTIONS
     . = ALIGN (8);
     __bss_end = ABSOLUTE(.);
   } GROUP_LINK_IN(RAMABLE_REGION)
+
 
   SECTION_DATA_PROLOGUE(_NOINIT_SECTION_NAME, (NOLOAD),)
   {

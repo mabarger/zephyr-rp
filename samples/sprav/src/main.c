@@ -22,7 +22,7 @@
 
 int main(void)
 {
-#if 1
+#if 0
 	struct pmp_config cfg[PMP_MAX_REGIONS];
 	memset(cfg, 0, sizeof(struct pmp_config) * PMP_MAX_REGIONS);
 
@@ -37,9 +37,9 @@ int main(void)
 	}
 #endif
 
-	uint8_t signature[3100] = {0};
-	printk("sprav_attest_region: %d\n", sprav_attest_region(0x20000000, 0x400, 0x9f6e4ed0, signature));
-	for (int i = 0; i < 2452; i++) {
+	uint8_t signature[5120] = {0};
+	printk("sprav_attest_region: %d\n", sprav_attest_region(0x42010020, 0x400, 0x9f6e4ed0, signature));
+	for (int i = 0; i < 2420; i++) {
 		printk("%02x", signature[i]);
 	}
 	printk("\n");
