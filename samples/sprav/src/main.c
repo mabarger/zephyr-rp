@@ -13,7 +13,7 @@
 #include <zephyr/kernel.h>
 #include <zephyr/sys/printk.h>
 #include <zephyr/drivers/sprav.h>
-#if 1
+#if 0
 #include <zephyr/drivers/pmp.h>
 #endif
 

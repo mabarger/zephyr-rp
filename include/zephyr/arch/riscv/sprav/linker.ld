@@ -6,6 +6,7 @@
 		/* Functions that will be placed in prac */
 		*(.text.sprav*);
 		*(.text.tc_sha256*);
+		*(.text.OQS*);
 		*(.text.uECC*);
 
 		/* Pad with 0x00 to alignment border */
