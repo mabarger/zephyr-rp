@@ -9,6 +9,8 @@ target_sources(app PRIVATE src/main.c)
 
 include(ExternalProject)
 
+set(sprav_wrapper_path "${CMAKE_CURRENT_LIST_DIR}/sprav_wrappers.h")
+
 set(liboqs_root_dir    /home/haru/liboqs-riscv)
 set(liboqs_build_dir   /home/haru/liboqs-riscv/build)
 
@@ -30,16 +32,21 @@ execute_process(
   COMMAND touch /home/haru/liboqs-riscv/build/lib/liboqs.a
   )
 
+# Add external project and configure build options
+set(CMAKE_VERBOSE_MAKEFILE ON)
 ExternalProject_Add(
   liboqs_project
   PREFIX     ${liboqs_root_dir}
   SOURCE_DIR ${liboqs_root_dir}
   BINARY_DIR ${liboqs_build_dir}
-  CMAKE_ARGS -DCMAKE_TOOLCHAIN_FILE=../.CMake/toolchain_riscv32.cmake
-             -DOQS_BUILD_ONLY_LIB=1
-             -DOQS_USE_OPENSSL=0
+  CMAKE_ARGS -GNinja
+             -DCMAKE_TOOLCHAIN_FILE=../.CMake/toolchain_riscv32.cmake
+	     -DOQS_BUILD_ONLY_LIB=1
+	     -DOQS_USE_OPENSSL=0
 	     -DOQS_PERMIT_UNSUPPORTED_ARCHITECTURE=ON
 	     -DOQS_ALGS_ENABLED="STD"
+	     -DCMAKE_C_FLAGS:STRING=-fno-stack-protector
+	     -DCMAKE_C_FLAGS:STRING=-include${sprav_wrapper_path}
              ..
   BUILD_COMMAND ${CMAKE_COMMAND} -E env ninja
   INSTALL_COMMAND ""
@@ -47,6 +54,7 @@ ExternalProject_Add(
   BUILD_BYPRODUCTS ${LIBOQS_LIB_DIR/liboqs.a}
   )
 
+# Add and configure library
 add_library(liboqs_lib STATIC IMPORTED GLOBAL)
 add_dependencies(
   liboqs_lib
@@ -55,5 +63,6 @@ add_dependencies(
 
 set_target_properties(liboqs_lib PROPERTIES IMPORTED_LOCATION ${LIBOQS_LIB_DIR}/liboqs.a)
 set_target_properties(liboqs_lib PROPERTIES INTERFACE_INCLUDE_DIRECTORIES ${LIBOQS_INCLUDE_DIR})
+zephyr_include_directories(/home/haru/liboqs-riscv/build/include)
 
 target_link_libraries(app PUBLIC liboqs_lib)

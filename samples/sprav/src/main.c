@@ -13,7 +13,7 @@
 #include <zephyr/kernel.h>
 #include <zephyr/sys/printk.h>
 #include <zephyr/drivers/sprav.h>
-#if 0
+#if 1
 #include <zephyr/drivers/pmp.h>
 #endif
 
@@ -22,7 +22,7 @@
 
 int main(void)
 {
-#if 0
+#if 1
 	struct pmp_config cfg[PMP_MAX_REGIONS];
 	memset(cfg, 0, sizeof(struct pmp_config) * PMP_MAX_REGIONS);
 
@@ -38,7 +38,8 @@ int main(void)
 #endif
 
 	uint8_t signature[5120] = {0};
-	printk("sprav_attest_region: %d\n", sprav_attest_region(0x42010020, 0x400, 0x9f6e4ed0, signature));
+	printk("[~] sprav_attest_region: %s\n", sprav_attest_region(0x42010020, 0x400, 0x9f6e4ed0, signature) ? "failure" : "success");
+	printk("[~] Signature:\n");
 	for (int i = 0; i < 2420; i++) {
 		printk("%02x", signature[i]);
 	}
