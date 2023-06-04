@@ -1,0 +1,3 @@
+[submodule "samples/sprav/liboqs"]
+	path = samples/sprav/liboqs
+	url = git@github.com:mabarger/liboqs-riscv.git
