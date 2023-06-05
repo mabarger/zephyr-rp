@@ -37,10 +37,10 @@ int main(void)
 	}
 #endif
 
-	uint8_t signature[5120] = {0};
+	uint8_t signature[SPRAV_SIG_SIZE] = {0};
 	printk("[~] sprav_attest_region: %s\n", sprav_attest_region(0x42010020, 0x400, 0x9f6e4ed0, signature) ? "failure" : "success");
 	printk("[~] Signature:\n");
-	for (int i = 0; i < 2420; i++) {
+	for (size_t i = 0; i < SPRAV_SIG_SIZE; i++) {
 		printk("%02x", signature[i]);
 	}
 	printk("\n");

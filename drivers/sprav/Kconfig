@@ -1,0 +1,30 @@
+# SPRAV configuration options
+
+# Copyright (c) 2023 Maximilian Barger
+# SPDX-License-Identifier: Apache-2.0
+
+config SPRAV
+	bool "SPRAV (Simple Post-Quantum Remote Attestation for RISC-V Devices)"
+	default n
+	help
+	  "Enables SPRAV"
+
+if SPRAV
+	config MAIN_STACK_SIZE
+		default 65535
+	config ENTROPY_GENERATOR
+		default y
+endif
+
+config SPRAV_ECDSA
+	bool "Use ECDSA Signatures (not recommended, for testing only)"
+	depends on SPRAV
+	select TINYCRYPT
+	default n
+	help
+	  "Use ECDSA signatures for attestation (not recommended)"
+
+if SPRAV_ECDSA
+	config TINYCRYPT_ECC_DSA
+		default y
+endif

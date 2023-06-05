@@ -2,6 +2,6 @@
 
 zephyr_library()
 
-zephyr_library_sources(sprav.c)
-zephyr_library_sources(sprav_heap.c)
-zephyr_library_sources(boot.S)
+zephyr_library_sources_ifdef(CONFIG_SPRAV sprav.c)
+zephyr_library_sources_ifdef(CONFIG_SPRAV sprav_heap.c)
+zephyr_library_sources_ifdef(CONFIG_SPRAV boot.S)

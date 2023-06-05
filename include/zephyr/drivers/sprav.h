@@ -11,6 +11,13 @@
 extern "C" {
 #endif
 
+#if defined(CONFIG_SPRAV_ECDSA)
+#define SPRAV_SIG_SIZE (64)
+#else
+#include <oqs/sig_dilithium.h>
+#define SPRAV_SIG_SIZE (OQS_SIG_dilithium_2_length_signature)
+#endif
+
 /**
  * @brief Attest the specified memory region
  *
