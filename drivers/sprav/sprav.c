@@ -23,10 +23,8 @@
 #define SHA3_256_DIGEST_SIZE (32)
 #define MSG_SIZE (SHA3_256_DIGEST_SIZE + sizeof(uint64_t))
 
-#define SPRAV_HEAP_MAX_SIZE (64 * 1024)
 int liboqs_errno = 0;
 int __errno_location = (int)&liboqs_errno;
-K_HEAP_DEFINE(sprav_heap, SPRAV_HEAP_MAX_SIZE);
 
 /* Wrappers for liboqs library calls */
 void *__memcpy_chk(void *dest, const void *src, size_t n)
@@ -36,17 +34,9 @@ void *__memcpy_chk(void *dest, const void *src, size_t n)
 
 void sprav_exit(int status)
 {
+	/* TODO: Use long jump to return to syscall and return error */
+	printk("exit()\n");
 	return;
-}
-
-void *sprav_malloc(size_t size)
-{
-	return k_heap_alloc(&sprav_heap, size, K_FOREVER);
-}
-
-void sprav_free(void *ptr)
-{
-	k_heap_free(&sprav_heap, ptr);
 }
 
 void sprav_perror(const char *s)

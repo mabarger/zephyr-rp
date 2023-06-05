@@ -3,4 +3,5 @@
 zephyr_library()
 
 zephyr_library_sources(sprav.c)
+zephyr_library_sources(sprav_heap.c)
 zephyr_library_sources(boot.S)
