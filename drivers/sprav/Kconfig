@@ -11,7 +11,7 @@ config SPRAV
 
 if SPRAV
 	config MAIN_STACK_SIZE
-		default 65535
+		default 131072
 	config ENTROPY_GENERATOR
 		default y
 endif

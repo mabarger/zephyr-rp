@@ -37,7 +37,6 @@ ExternalProject_Add(
   PREFIX         ${liboqs_root_dir}
   SOURCE_DIR     ${liboqs_root_dir}
   BINARY_DIR     ${liboqs_build_dir}
-  STAMP_DIR      ""
   CMAKE_ARGS     -GNinja
                  -DCMAKE_TOOLCHAIN_FILE=../.CMake/toolchain_riscv32.cmake
 		 -DOQS_BUILD_ONLY_LIB=1
