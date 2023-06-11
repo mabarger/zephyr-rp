@@ -15,7 +15,9 @@ GTEXT(__initialize)
 GTEXT(_isr_wrapper)
 
 SECTION_FUNC(vectors, __start)
+#if defined(CONFIG_SPRAV)
 call __sprav_setup_pmp
+#endif
 
 #if defined(CONFIG_RISCV_GP)
 	/* Initialize global pointer */

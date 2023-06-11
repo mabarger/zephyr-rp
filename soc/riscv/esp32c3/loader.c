@@ -68,6 +68,10 @@ static int map_rom_segments(void)
 }
 #endif
 
+#if defined(CONFIG_SPRAV)
+extern void __sprav_setup_pmp();
+#endif
+
 void __start(void)
 {
 #ifdef CONFIG_BOOTLOADER_MCUBOOT
@@ -77,6 +81,9 @@ void __start(void)
 		ets_printf("Failed to setup XIP, aborting\n");
 		abort();
 	}
+#endif
+#if defined(CONFIG_SPRAV)
+	__sprav_setup_pmp();
 #endif
 	__esp_platform_start();
 }

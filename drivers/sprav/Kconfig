@@ -16,15 +16,8 @@ if SPRAV
 		default y
 endif
 
-config SPRAV_ECDSA
-	bool "Use ECDSA Signatures (not recommended, for testing only)"
+config SPRAV_PRAC_ONLY
+	bool "Operate without a vrac: Only output information (for debugging only)"
 	depends on SPRAV
-	select TINYCRYPT
-	default n
 	help
-	  "Use ECDSA signatures for attestation (not recommended)"
-
-if SPRAV_ECDSA
-	config TINYCRYPT_ECC_DSA
-		default y
-endif
+	  "Operate without a vrac: Only output information (for debugging only)"

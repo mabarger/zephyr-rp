@@ -30,7 +30,7 @@ extern "C" {
  *
  * @return 0 on success, -EFAULT otherwise.
  */
-int sprav_attest_region_protected(uintptr_t addr, size_t size, uint64_t nonce,
+int sprav_attest_region_protected(uintptr_t addr, size_t size, uint32_t nonce,
 		     		  uint8_t *signature);
 
 /**
@@ -43,11 +43,11 @@ int sprav_attest_region_protected(uintptr_t addr, size_t size, uint64_t nonce,
  *
  * @return 0 on success, -EFAULT otherwise.
  */
-__syscall int sprav_attest_region(uintptr_t addr, size_t size, uint64_t nonce,
+__syscall int sprav_attest_region(uintptr_t addr, size_t size, uint32_t nonce,
 				  uint8_t *signature);
 
 static inline int z_impl_sprav_attest_region(uintptr_t addr, size_t size,
-					     uint64_t nonce,
+					     uint32_t nonce,
 					     uint8_t *signature)
 {
 	return sprav_attest_region_protected(addr, size, nonce, signature);

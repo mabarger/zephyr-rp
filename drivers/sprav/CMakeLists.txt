@@ -12,4 +12,4 @@ execute_process(
 
 zephyr_library_sources_ifdef(CONFIG_SPRAV sprav.c)
 zephyr_library_sources_ifdef(CONFIG_SPRAV sprav_heap.c)
-zephyr_library_sources_ifdef(CONFIG_SPRAV boot.S)
+zephyr_library_sources_ifdef(CONFIG_SPRAV sprav_configure_pmp.S)

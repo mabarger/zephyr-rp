@@ -13,25 +13,12 @@
 #include <zephyr/sys/util.h>
 #include <zephyr/toolchain.h>
 
-#if defined(CONFIG_SPRAV_ECDSA)
-#include <tinycrypt/ecc.h>
-#include <tinycrypt/ecc_dsa.h>
-#endif
-
 #include <oqs/oqs.h>
 
-#if defined(CONFIG_SPRAV_ECDSA)
-#define ATTESTATION_KEY_SIZE NUM_ECC_BYTES
-#else
 #define ATTESTATION_KEY_SIZE OQS_SIG_dilithium_2_length_secret_key
-#endif
 
 #define SHA_256_DIGEST_SIZE (32)
-#define MSG_SIZE (SHA_256_DIGEST_SIZE + sizeof(uint64_t))
-
-/* Start and End locations for the prac section */
-extern uint8_t *prac_begin;
-extern uint8_t *prac_end;
+#define MSG_SIZE (SHA_256_DIGEST_SIZE + sizeof(uint32_t))
 
 /* Pointer to the temporary attestation key */
 static uint8_t *sprav_attestation_key = NULL;
@@ -64,7 +51,9 @@ void sprav_exit(int status)
 
 void sprav_perror(const char *s)
 {
+#if defined(CONFIG_SPRAV_PRAC_ONLY)
 	printk("[!] perror(): %s\n", s);
+#endif
 }
 
 FILE *fopen(const char *pathname, const char *mode)
@@ -95,17 +84,11 @@ size_t fread(void *ptr, size_t size, size_t nmemb, FILE *stream)
 /**
  * @brief Load the attestation key into memory using immediate values
  */
-ALWAYS_INLINE void sprav_load_attestation_key()
+static ALWAYS_INLINE void sprav_load_attestation_key()
 {
-#if defined(CONFIG_SPRAV_ECDSA)
-
-{LOAD_ATTESTATION_KEY_ECDSA_PLACEHOLDER}
-
-#else
 
 {LOAD_ATTESTATION_KEY_PLACEHOLDER}
 
-#endif
 }
 
 /**
@@ -118,18 +101,13 @@ static void sprav_zero_attestation_key()
 	}
 }
 
-int sprav_attest_region_protected(uintptr_t addr, size_t size, uint64_t nonce,
+int sprav_attest_region_protected(uintptr_t addr, size_t size, uint32_t nonce,
 				  uint8_t *signature)
 {
 	size_t sig_len = 0;
 	uint8_t msg[MSG_SIZE] = {0};
-	uint64_t *nonce_ptr = (uint64_t *) (msg + SHA_256_DIGEST_SIZE);
-#if defined(CONFIG_SPRAV_ECDSA)
-	const struct uECC_Curve_t *curve = uECC_secp256r1();
-	int ret = 0;
-#else
+	uint32_t *nonce_ptr = (uint32_t *) (msg + SHA_256_DIGEST_SIZE);
 	OQS_STATUS ret = 0;
-#endif
 
 	uint8_t sprav_attestation_key_local[ATTESTATION_KEY_SIZE];
 	sprav_attestation_key = (uint8_t *) &sprav_attestation_key_local;
@@ -144,14 +122,8 @@ int sprav_attest_region_protected(uintptr_t addr, size_t size, uint64_t nonce,
 	OQS_SHA3_sha3_256(msg, (uint8_t *) addr, size);
 	*nonce_ptr = nonce;
 
-	/* Compute Signature over hash & nonce */
-#if defined(CONFIG_SPRAV_ECDSA)
-	ret = uECC_sign_with_k(sprav_attestation_key, msg,
-			       MSG_SIZE,
-			       (uECC_word_t *) nonce_ptr, signature, curve);
-	ret = !ret;
-#else
 	/* Save sp and pc to catch exit() from liboqs */
+	/* recovery point for exit() */
 	liboqs_exit_flag = false;
 	__asm__ volatile("mv %0, sp" : "=r"(saved_sp));
 	__asm__ volatile("sprav_exit_catch: la %0, sprav_exit_catch" : "=r" (saved_pc));
@@ -161,9 +133,9 @@ int sprav_attest_region_protected(uintptr_t addr, size_t size, uint64_t nonce,
 		goto cleanup;
 	}
 
+	/* Compute Signature over hash & nonce */
 	ret = OQS_SIG_dilithium_2_sign(signature, &sig_len, msg, MSG_SIZE,
 				       sprav_attestation_key);
-#endif
 
 cleanup:
 	/* Zero out temporary attestation key */
@@ -189,7 +161,7 @@ cleanup:
 		"mv a7, x0\n"
 		);
 
-	return ret ? -EFAULT : 0;
+	return ret;
 }
 
 #pragma GCC pop_options

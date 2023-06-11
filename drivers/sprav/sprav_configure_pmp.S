@@ -2,6 +2,10 @@
  * Copyright (c) 2023 Maximilian Barger
  *
  * SPDX-License-Identifier: Apache-2.0
+ *
+ * This code is intended to be run directly after the system has booted and
+ * will use the first two PMP regions to protect the prover remote attestation
+ * code (prac) by applying execute-only permissions and locking the regions.
  */
 
 #include <zephyr/toolchain.h>
