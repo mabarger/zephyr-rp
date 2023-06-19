@@ -48,7 +48,10 @@ void sprav_free(void *ptr)
 		entry = (struct sprav_hn *) node;
 
 		if (entry->ptr == ptr) {
-			memset(entry->ptr, 0, entry->size);
+			uint8_t *mem_ptr = entry->ptr;
+			for (size_t i = 0; i < entry->size; i++) {
+				mem_ptr[i] = 0x00;
+			}
 			sys_slist_find_and_remove(&sprav_heap_list, node);
 			k_free(entry);
 			break;

@@ -20,6 +20,9 @@
 #define SHA_256_DIGEST_SIZE (32)
 #define MSG_SIZE (SHA_256_DIGEST_SIZE + sizeof(uint32_t))
 
+/* Main stack */
+extern char z_main_stack[];
+
 /* Pointer to the temporary attestation key */
 static uint8_t *sprav_attestation_key = NULL;
 
@@ -141,6 +144,13 @@ cleanup:
 	/* Zero out temporary attestation key */
 	sprav_zero_attestation_key(sprav_attestation_key);
 	sprav_attestation_key = NULL;
+
+	/* Zero out used stack */
+	__asm__ volatile("mv %0, sp" : "=r"(saved_sp));
+	uint8_t *stack_ptr = (uint8_t *) z_main_stack;
+	for (;stack_ptr != (uint8_t *) saved_sp; stack_ptr++) {
+		*stack_ptr = 0x00;
+	}
 
 	/* Zero out temporary and argument registers */
 	__asm__ volatile (

@@ -25,10 +25,7 @@ set(submake "make")
 endif()
 
 # Create build folder
-execute_process(
-  COMMAND ${CMAKE_COMMAND} -E make_directory ${liboqs_build_dir}
-  COMMAND ${CMAKE_COMMAND} -E make_directory ${liboqs_include_dir}
-  )
+file(MAKE_DIRECTORY ${liboqs_include_dir})
 
 # Add external project and configure build options
 set(CMAKE_VERBOSE_MAKEFILE ON)
@@ -37,16 +34,15 @@ ExternalProject_Add(
   PREFIX         ${liboqs_root_dir}
   SOURCE_DIR     ${liboqs_root_dir}
   BINARY_DIR     ${liboqs_build_dir}
-  CMAKE_ARGS     -GNinja
-                 -DCMAKE_TOOLCHAIN_FILE=../.CMake/toolchain_riscv32.cmake
-		 -DOQS_BUILD_ONLY_LIB=1
-		 -DOQS_USE_OPENSSL=0
+  CMAKE_ARGS     -DCMAKE_TOOLCHAIN_FILE=../.CMake/toolchain_riscv32.cmake
+                 -DOQS_BUILD_ONLY_LIB=ON
+		 -DOQS_USE_OPENSSL=OFF
 		 -DOQS_PERMIT_UNSUPPORTED_ARCHITECTURE=ON
 		 -DOQS_ALGS_ENABLED="STD"
 		 -DCMAKE_C_FLAGS:STRING=-fno-stack-protector
 		 -DCMAKE_C_FLAGS:STRING=-include${sprav_wrapper_path}
 		 ..
-  BUILD_COMMAND ${CMAKE_COMMAND} -E env ninja
+  CMAKE_GENERATOR "Ninja"
   INSTALL_COMMAND ""
   TEST_COMMAND ""
   BUILD_BYPRODUCTS ${liboqs_lib_dir}/liboqs.a
