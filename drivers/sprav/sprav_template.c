@@ -24,7 +24,7 @@
 extern char z_main_stack[];
 
 /* Pointer to the temporary attestation key */
-static uint8_t *sprav_attestation_key = NULL;
+static uint8_t sprav_attestation_key[ATTESTATION_KEY_SIZE] = {0};
 
 /* liboqs error tracking & exit wrapping */
 int liboqs_errno = 0;
@@ -82,16 +82,24 @@ size_t fread(void *ptr, size_t size, size_t nmemb, FILE *stream)
 #pragma GCC push_options
 #pragma GCC optimize ("O0")
 #define STORE_WORD_IMMEDIATE(dst, word) \
-	__asm__ volatile("sw %1, 0(%0)" : : "r" (dst), "r" (word));
+	__asm__ volatile("la t0, " #dst); \
+	__asm__ volatile("li t1, " #word); \
+	__asm__ volatile("sw t1, 0(t0)");
 
 /**
  * @brief Load the attestation key into memory using immediate values
  */
 static ALWAYS_INLINE void sprav_load_attestation_key()
 {
+	__asm__ volatile("addi sp, sp, -8");
+	__asm__ volatile("sw t0, 0(sp)");
+	__asm__ volatile("sw t1, 4(sp)");
 
 {LOAD_ATTESTATION_KEY_PLACEHOLDER}
 
+	__asm__ volatile("lw t0, 0(sp)");
+	__asm__ volatile("lw t1, 4(sp)");
+	__asm__ volatile("addi sp, sp, 8");
 }
 
 /**
@@ -111,9 +119,6 @@ int sprav_attest_region_protected(uintptr_t addr, size_t size, uint32_t nonce,
 	uint8_t msg[MSG_SIZE] = {0};
 	uint32_t *nonce_ptr = (uint32_t *) (msg + SHA_256_DIGEST_SIZE);
 	OQS_STATUS ret = 0;
-
-	uint8_t sprav_attestation_key_local[ATTESTATION_KEY_SIZE];
-	sprav_attestation_key = (uint8_t *) &sprav_attestation_key_local;
 
 	/* Configure RNG for liboqs */
 	OQS_randombytes_custom_algorithm(sprav_csrand);
@@ -142,8 +147,7 @@ int sprav_attest_region_protected(uintptr_t addr, size_t size, uint32_t nonce,
 
 cleanup:
 	/* Zero out temporary attestation key */
-	sprav_zero_attestation_key(sprav_attestation_key);
-	sprav_attestation_key = NULL;
+	sprav_zero_attestation_key();
 
 	/* Zero out used stack */
 	__asm__ volatile("mv %0, sp" : "=r"(saved_sp));
