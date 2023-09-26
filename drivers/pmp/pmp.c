@@ -20,6 +20,31 @@
 #define CONFIG_PMP_SLOTS PMP_MAX_REGIONS
 #endif
 
+static size_t find_lsb_unset(size_t value)
+{
+	int res = 0;
+	if (value == 0) {
+		return res;
+	}
+
+	while (value & 1) {
+		value >>= 1;
+		res++;
+	}
+
+	return res;
+}
+
+size_t int_pow(size_t base, size_t exp) {
+	size_t res = 0;
+
+	while (exp--) {
+		res *= base;
+	}
+
+	return res;
+}
+
 static void read_pmp_register(int region_id, size_t *addr, size_t *conf)
 {
 	switch (region_id) {
@@ -102,6 +127,7 @@ static void parse_pmp_register(struct pmp_config *pmp_cfg, int region_id)
 	size_t conf = 0;
 	size_t prev_addr = 0;
 	size_t prev_conf = 0;
+	size_t temp = 0;
 
 	/* Read PMP register */
 	read_pmp_register(region_id, &addr, &conf);
@@ -127,7 +153,9 @@ static void parse_pmp_register(struct pmp_config *pmp_cfg, int region_id)
 			pmp_cfg->base = addr << 2;
 			break;
 		case PMP_NAPOT:
-			/* TODO */
+			temp = find_lsb_unset(addr);
+			pmp_cfg->size = int_pow(2, temp+3);
+			pmp_cfg->base = addr & (SIZE_MAX << temp);
 			break;
 		case 0x00:
 			pmp_cfg->base = addr;

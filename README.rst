@@ -32,6 +32,21 @@ SPARC, MIPS, and a large number of `supported boards`_.
 
 .. below included in doc/introduction/introduction.rst
 
+SPRAV
+***************
+To configure and build SPRAV, follow these steps:
+
+#. Set up Zephyr with west as explained in the `Getting Started Guide`_ using this repository as Zephyr repository
+
+#. Configure Zephyr for SPRAV and build it for the target board::
+
+        west build -b esp32c3_devkitm samples/sprav
+
+#. Flash the binary::
+
+        west flash
+
+For the corresponding vrac see `sprav-vrac`_
 
 Getting Started
 ***************
@@ -83,6 +98,7 @@ Here's a quick summary of resources to help you find your way around:
 .. _Zephyr Documentation: http://docs.zephyrproject.org
 .. _Introduction to Zephyr: http://docs.zephyrproject.org/latest/introduction/index.html
 .. _Getting Started Guide: http://docs.zephyrproject.org/latest/develop/getting_started/index.html
+.. _sprav-vrac: https://github.com/mabarger/sprav-vrac
 .. _Contribution Guide: http://docs.zephyrproject.org/latest/contribute/index.html
 .. _Zephyr GitHub wiki: https://github.com/zephyrproject-rtos/zephyr/wiki
 .. _Zephyr Development mailing list: https://lists.zephyrproject.org/g/devel
