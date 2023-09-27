@@ -36,7 +36,16 @@ SPRAV
 ***************
 To configure and build SPRAV, follow these steps:
 
-#. Set up Zephyr with west as explained in the `Getting Started Guide`_ using this repository as Zephyr repository
+#. Set up Zephyr with west as explained in the `Getting Started Guide`_ using this repository as Zephyr repository::
+
+        # instead of west 'init ~/zephyrproject' run the following:
+        west init ~/zephyrproject -m https://github.com/mabarger/zephyr-sprav/ --mr sprav
+
+#. Pull the liboqs submodule::
+
+        cd zephyr
+        git submodule init
+        git submodule update
 
 #. Configure Zephyr for SPRAV and build it for the target board::
 
